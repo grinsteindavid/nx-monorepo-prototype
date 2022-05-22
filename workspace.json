@@ -1,5 +1,10 @@
 {
   "$schema": "./node_modules/nx/schemas/workspace-schema.json",
   "version": 2,
-  "projects": {}
+  "projects": {
+    "admin-api": "apps/admin-api",
+    "admin-ui": "apps/admin-ui",
+    "admin-ui-e2e": "apps/admin-ui-e2e",
+    "clickster-shared": "libs/clickster-shared"
+  }
 }

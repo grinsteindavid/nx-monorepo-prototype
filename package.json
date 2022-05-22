@@ -7,7 +7,7 @@
     "build": "nx build",
     "test": "nx test"
   },
-  "private": true,
+  "private": false,
   "dependencies": {
     "core-js": "^3.6.5",
     "express": "4.17.2",

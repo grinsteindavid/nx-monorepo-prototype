@@ -1,16 +1,29 @@
 # This config is equivalent to both the '.circleci/extended/orb-free.yml' and the base '.circleci/config.yml'
 version: 2.1
 
-# Invoke jobs via workflows
-# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+jobs:
+  test:
+    docker:
+      - image: cimg/node:16.11.1
+    steps:
+      - checkout
+      # look for existing cache and restore if found
+      - restore_cache:
+        key: v1-deps-{{ checksum "package-lock.json" }}
+      # install dependencies    
+      - run:
+        name: install dependencies
+        command: npm install
+      # save any changes to the cache
+      - save_cache:
+        key: v1-deps-{{ checksum "package-lock.json" }}
+        paths:
+          - node_modules
+      # run test suite
+      - run:
+        name: test
+        command: npm run test
 workflows:
-  sample: # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run.
+  build_and_test:
     jobs:
-      - build_and_test:
-        docker:
-          - image: cimg/node:16.11.1
-          # run test suite
-          - run:
-            name: test
-            command: npm run test
+      - test

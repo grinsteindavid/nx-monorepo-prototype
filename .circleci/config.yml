@@ -30,6 +30,8 @@ jobs:
   build: 
     executor: workspace-executor
     steps:
+      - attach_workspace:
+          at: .
       - checkout
       - restore_cache:
           key: v1-deps-{{ checksum "package-lock.json" }}

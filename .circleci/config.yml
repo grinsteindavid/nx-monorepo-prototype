@@ -2,12 +2,11 @@
 version: 2.1
 
 jobs:
-  test:
+  build: 
     docker:
-      - image: cimg/node:16.11.1
+      - image: cimg/node:14.17.0
     steps:
       - checkout
-      # look for existing cache and restore if found
       - restore_cache:
           key: v1-deps-{{ checksum "package-lock.json" }}
       # install dependencies    
@@ -19,6 +18,17 @@ jobs:
           key: v1-deps-{{ checksum "package-lock.json" }}
           paths:
             - node_modules
+      - run:
+          name: build
+          command: npx nx build admin-ui
+  test:
+    docker:
+      - image: cimg/node:14.17.0
+    steps:
+      - checkout
+      # look for existing cache and restore if found
+      - restore_cache:
+          key: v1-deps-{{ checksum "package-lock.json" }}
       # run test suite
       - run:
           name: test
@@ -26,4 +36,7 @@ jobs:
 workflows:
   build_and_test:
     jobs:
-      - test
+      - build
+      - test:
+         requires:
+           - build

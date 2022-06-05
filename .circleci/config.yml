@@ -27,7 +27,7 @@ jobs:
           root: .
           paths:
             - .
-  build: 
+  build-admin-ui: 
     executor: workspace-executor
     steps:
       - attach_workspace:
@@ -36,9 +36,9 @@ jobs:
       - restore_cache:
           key: v1-deps-{{ checksum "package-lock.json" }}
       - run:
-          name: build
+          name: build admin-ui
           command: npx nx build admin-ui
-  test:
+  test-admin-ui:
     executor: workspace-executor
     steps:
       - attach_workspace:
@@ -48,15 +48,30 @@ jobs:
           key: v1-deps-{{ checksum "package-lock.json" }}
       # run test suite
       - run:
-          name: test
+          name: test admin-ui
           command: npx nx test admin-ui
+  test-admin-api:
+    executor: workspace-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - checkout
+      - restore_cache:
+          key: v1-deps-{{ checksum "package-lock.json" }}
+      # run test suite
+      - run:
+          name: test admin-api
+          command: npx nx test admin-api
 workflows:
   build_and_test:
     jobs:
       - setup
-      - test:
+      - test-admin-ui:
           requires:
             - setup
-      - build:
+      - build-admin-ui:
          requires:
-           - test
+           - test-admin-ui
+      - test-admin-api:
+          requires:
+            - setup

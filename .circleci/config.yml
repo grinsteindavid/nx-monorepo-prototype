@@ -53,7 +53,10 @@ jobs:
 workflows:
   build_and_test:
     jobs:
-      - test
+      - setup
+      - test:
+          requires:
+            - setup
       - build:
          requires:
            - test

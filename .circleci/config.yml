@@ -13,14 +13,12 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: v1-deps-{{ checksum "package-lock.json" }}
-      # install dependencies    
+          key: node_modules-{{ checksum "package-lock.json" }} 
       - run:
           name: install dependencies
           command: npm install
-      # save any changes to the cache
       - save_cache:
-          key: v1-deps-{{ checksum "package-lock.json" }}
+          key: node_modules-{{ checksum "package-lock.json" }}
           paths:
             - node_modules
       - persist_to_workspace:
@@ -34,7 +32,7 @@ jobs:
           at: .
       - checkout
       - restore_cache:
-          key: v1-deps-{{ checksum "package-lock.json" }}
+          key: node_modules-{{ checksum "package-lock.json" }}
       - run:
           name: build admin-ui
           command: npx nx build admin-ui
@@ -45,8 +43,7 @@ jobs:
           at: .
       - checkout
       - restore_cache:
-          key: v1-deps-{{ checksum "package-lock.json" }}
-      # run test suite
+          key: node_modules-{{ checksum "package-lock.json" }}
       - run:
           name: test admin-ui
           command: npx nx test admin-ui
@@ -57,8 +54,7 @@ jobs:
           at: .
       - checkout
       - restore_cache:
-          key: v1-deps-{{ checksum "package-lock.json" }}
-      # run test suite
+          key: node_modules-{{ checksum "package-lock.json" }}
       - run:
           name: test admin-api
           command: npx nx test admin-api

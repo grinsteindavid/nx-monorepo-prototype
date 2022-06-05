@@ -1,0 +1,69 @@
+# This config is equivalent to both the '.circleci/extended/orb-free.yml' and the base '.circleci/config.yml'
+version: 2.1
+
+executors:
+  workspace-executor:
+    docker:
+      - image: cimg/node:14.17.0
+    working_directory: /tmp/workspace
+
+jobs:
+  setup:
+    executor: workspace-executor
+    steps:
+      - checkout
+      - restore_cache:
+          key: node_modules-{{ checksum "package-lock.json" }} 
+      - run:
+          name: install dependencies
+          command: npm ci
+      - save_cache:
+          key: node_modules-{{ checksum "package-lock.json" }}
+          paths:
+            - node_modules
+  build-admin-ui: 
+    executor: workspace-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - checkout
+      - restore_cache:
+          key: node_modules-{{ checksum "package-lock.json" }}
+      - run:
+          name: build admin-ui
+          command: npx nx build admin-ui
+  test-admin-ui:
+    executor: workspace-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - checkout
+      - restore_cache:
+          key: node_modules-{{ checksum "package-lock.json" }}
+      - run:
+          name: test admin-ui
+          command: npx nx test admin-ui
+  test-admin-api:
+    executor: workspace-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - checkout
+      - restore_cache:
+          key: node_modules-{{ checksum "package-lock.json" }}
+      - run:
+          name: test admin-api
+          command: npx nx test admin-api
+workflows:
+  build_and_test:
+    jobs:
+      - setup
+      - test-admin-ui:
+          requires:
+            - setup
+      - build-admin-ui:
+         requires:
+           - test-admin-ui
+      - test-admin-api:
+          requires:
+            - setup

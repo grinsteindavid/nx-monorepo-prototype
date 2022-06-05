@@ -1,11 +1,18 @@
 # This config is equivalent to both the '.circleci/extended/orb-free.yml' and the base '.circleci/config.yml'
 version: 2.1
 
-jobs:
-  build: 
+executors:
+  workspace-executor:
     docker:
       - image: cimg/node:14.17.0
+    working_directory: /tmp/workspace
+
+jobs:
+  build: 
+    executor: workspace-executor
     steps:
+      - attach_workspace:
+          at: .
       - checkout
       - restore_cache:
           key: v1-deps-{{ checksum "package-lock.json" }}
@@ -22,13 +29,17 @@ jobs:
           name: build
           command: npx nx build admin-ui
   test:
-    docker:
-      - image: cimg/node:14.17.0
+    executor: workspace-executor
     steps:
+      - attach_workspace:
+          at: .
+      - checkout
+      - restore_cache:
+          key: v1-deps-{{ checksum "package-lock.json" }}
       # run test suite
       - run:
           name: test
-          command: npx nx run-many --target=test --all=true
+          command: npx nx test admin-ui
 workflows:
   build_and_test:
     jobs:

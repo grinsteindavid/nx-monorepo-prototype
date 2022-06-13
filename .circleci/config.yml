@@ -1,6 +1,9 @@
 # This config is equivalent to both the '.circleci/extended/orb-free.yml' and the base '.circleci/config.yml'
 version: 2.1
 
+orbs:
+  sonarcloud: sonarsource/sonarcloud@1.1.0
+
 executors:
   workspace-executor:
     docker:
@@ -22,6 +25,11 @@ jobs:
           paths:
             - ~/.npm
             - node_modules
+  static-code-analytisis:
+    executor: workspace-executor
+    steps: 
+      - checkout
+      - sonarcloud/scan
   build-admin-ui: 
     executor: workspace-executor
     steps:
@@ -73,6 +81,8 @@ workflows:
   build_and_test:
     jobs:
       - setup
+      - static-code-analysis:
+          context: sonarcloud
       - test-admin-ui:
           requires:
             - setup

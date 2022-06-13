@@ -76,9 +76,10 @@ workflows:
           requires:
             - setup
       - build-admin-ui:
-         requires:
+          requires:
             - setup
       - deploy-admin-ui:
+            - build-admin-ui
             - test-admin-ui
       - test-admin-api:
           requires:

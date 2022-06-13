@@ -13,14 +13,14 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: node_modules-{{ checksum "package-lock.json" }} 
+          key: node_modules-{{ .Branch }}-{{ checksum "package-lock.json" }} 
       - run:
           name: install dependencies
           command: npm ci
       - save_cache:
-          key: node_modules-{{ checksum "package-lock.json" }}
+          key: node_modules-{{ .Branch }}-{{ checksum "package-lock.json" }}
           paths:
-            - node_modules
+            - ~/.npm
   build-admin-ui: 
     executor: workspace-executor
     steps:
@@ -28,10 +28,21 @@ jobs:
           at: .
       - checkout
       - restore_cache:
-          key: node_modules-{{ checksum "package-lock.json" }}
+          key: node_modules-{{ .Branch }}-{{ checksum "package-lock.json" }} 
       - run:
           name: build admin-ui
           command: npx nx build admin-ui
+  deploy-admin-ui:
+    executor: workspace-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - checkout
+      - restore_cache:
+          key: node_modules-{{ .Branch }}-{{ checksum "package-lock.json" }} 
+      - run:
+          name: deploy admin-ui
+          command: echo 'deployed!'
   test-admin-ui:
     executor: workspace-executor
     steps:
@@ -39,7 +50,7 @@ jobs:
           at: .
       - checkout
       - restore_cache:
-          key: node_modules-{{ checksum "package-lock.json" }}
+          key: node_modules-{{ .Branch }}-{{ checksum "package-lock.json" }} 
       - run:
           name: test admin-ui
           command: npx nx test admin-ui --codeCoverage=true
@@ -53,7 +64,7 @@ jobs:
           at: .
       - checkout
       - restore_cache:
-          key: node_modules-{{ checksum "package-lock.json" }}
+          key: node_modules-{{ .Branch }}-{{ checksum "package-lock.json" }} 
       - run:
           name: test admin-api
           command: npx nx test admin-api
@@ -66,7 +77,9 @@ workflows:
             - setup
       - build-admin-ui:
          requires:
-           - test-admin-ui
+            - setup
+      - deploy-admin-ui:
+            - test-admin-ui
       - test-admin-api:
           requires:
             - setup

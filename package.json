@@ -2,6 +2,7 @@
   "name": "testing-nx",
   "version": "0.0.0",
   "license": "MIT",
+  "description": "",
   "scripts": {
     "start": "nx serve",
     "build": "nx build",

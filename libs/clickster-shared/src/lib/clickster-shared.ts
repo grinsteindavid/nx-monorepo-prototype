@@ -1,5 +1,5 @@
 export function clicksterShared(): string {
-  return 'clickster-shared2';
+  return 'clickster-shared';
 }
 
 // testing static analysis
